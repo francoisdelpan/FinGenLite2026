@@ -1,0 +1,461 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --brand: #2F5AEA;
+        --brand-dark: #2447bb;
+        --brand-soft: #eef3ff;
+        --text: #162033;
+        --muted: #6b7280;
+        --border: #d9e2ff;
+        --danger: #c62828;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #fff;
+        color: var(--text);
+      }
+
+      .content {
+        padding: 18px 22px 16px;
+      }
+
+      .description {
+        display: block;
+        margin-bottom: 16px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .section {
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--brand);
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+        font: inherit;
+      }
+
+      input,
+      select {
+        padding: 11px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px rgba(47, 90, 234, 0.12);
+      }
+
+      .range-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .export-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .check-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--brand-soft);
+        cursor: pointer;
+      }
+
+      .check-card input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: var(--brand);
+      }
+
+      .check-card strong {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 14px;
+      }
+
+      .check-card span {
+        display: block;
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--muted);
+      }
+
+      .button {
+        margin-top: 8px;
+        padding: 12px 16px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(47, 90, 234, 0.22);
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      .button:hover {
+        background: var(--brand-dark);
+        transform: translateY(-1px);
+      }
+
+      .button:disabled {
+        cursor: wait;
+        opacity: 0.7;
+        transform: none;
+      }
+
+      .loader-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 3px solid rgba(47, 90, 234, 0.2);
+        border-top-color: var(--brand);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .result,
+      .error {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .result {
+        background: #f8faff;
+        border: 1px solid var(--border);
+      }
+
+      .result a {
+        color: var(--brand);
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .error {
+        background: #fff5f5;
+        border: 1px solid #f4c7c7;
+        color: var(--danger);
+      }
+
+      .footer {
+        padding: 0 22px 18px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .footer a {
+        color: var(--brand);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <? if (modalDescription) { ?>
+        <span class="description"><?= modalDescription ?></span>
+      <? } ?>
+
+      <div class="section">
+        <span class="section-title">Période</span>
+
+        <div class="field">
+          <label for="mode">Mode d'extraction</label>
+          <select id="mode">
+            <option value="month">Par mois</option>
+            <option value="range">Par plage de dates</option>
+          </select>
+        </div>
+
+        <div id="monthBox" class="field">
+          <label for="monthInput">Mois</label>
+          <input id="monthInput" type="month" />
+        </div>
+
+        <div id="rangeBox" class="range-grid hidden">
+          <div class="field">
+            <label for="startDate">Date de début</label>
+            <input id="startDate" type="date" />
+          </div>
+
+          <div class="field">
+            <label for="endDate">Date de fin</label>
+            <input id="endDate" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <div id="selectionSection" class="section hidden">
+        <span class="section-title">Filtre</span>
+
+        <div class="field">
+          <label id="selectionLabel" for="selectionValue"></label>
+          <select id="selectionValue"></select>
+        </div>
+      </div>
+
+      <div class="section">
+        <span class="section-title">Exports</span>
+
+        <div class="export-grid">
+          <label class="check-card">
+            <input id="exportPdf" type="checkbox" checked />
+            <span>
+              <strong>Export PDF</strong>
+              <span>Crée le fichier PDF comme aujourd'hui.</span>
+            </span>
+          </label>
+
+          <label class="check-card">
+            <input id="exportSheet" type="checkbox" />
+            <span>
+              <strong>Export Sheet</strong>
+              <span>Conserve la feuille générée dans le classeur.</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <button id="submitBtn" class="button" onclick="runExtraction()">Lancer l'extraction</button>
+
+      <div id="loader" class="loader-wrap hidden">
+        <div class="spinner"></div>
+        <div>Traitement en cours...</div>
+      </div>
+
+      <div id="error" class="error hidden"></div>
+      <div id="result" class="result hidden"></div>
+    </div>
+
+    <div class="footer">
+      <a href="https://utema.fr" target="_blank">byUtema</a>
+    </div>
+
+    <script>
+      const extractionType = <?= JSON.stringify(extractionType) ?>;
+      const selectionLabelText = <?= JSON.stringify(selectionLabel) ?>;
+      const selectionPlaceholder = <?= JSON.stringify(selectionPlaceholder) ?>;
+      const selectionOptions = <?= JSON.stringify(selectionOptions) ?>;
+
+      const modeEl = document.getElementById('mode');
+      const monthBox = document.getElementById('monthBox');
+      const rangeBox = document.getElementById('rangeBox');
+      const monthInput = document.getElementById('monthInput');
+      const startDate = document.getElementById('startDate');
+      const endDate = document.getElementById('endDate');
+      const selectionSection = document.getElementById('selectionSection');
+      const selectionLabel = document.getElementById('selectionLabel');
+      const selectionValue = document.getElementById('selectionValue');
+      const exportPdf = document.getElementById('exportPdf');
+      const exportSheet = document.getElementById('exportSheet');
+      const loader = document.getElementById('loader');
+      const error = document.getElementById('error');
+      const result = document.getElementById('result');
+      const submitBtn = document.getElementById('submitBtn');
+
+      monthInput.value = new Date().toISOString().slice(0, 7);
+      hydrateSelection();
+
+      modeEl.addEventListener('change', () => {
+        const byMonth = modeEl.value === 'month';
+        monthBox.classList.toggle('hidden', !byMonth);
+        rangeBox.classList.toggle('hidden', byMonth);
+        clearMessages();
+      });
+
+      function hydrateSelection() {
+        if (!selectionLabelText) return;
+
+        selectionSection.classList.remove('hidden');
+        selectionLabel.textContent = selectionLabelText;
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = selectionPlaceholder || 'Choisis une valeur';
+        selectionValue.appendChild(placeholder);
+
+        selectionOptions.forEach((optionValue) => {
+          const option = document.createElement('option');
+          option.value = optionValue;
+          option.textContent = optionValue;
+          selectionValue.appendChild(option);
+        });
+      }
+
+      function clearMessages() {
+        error.textContent = '';
+        error.classList.add('hidden');
+        result.innerHTML = '';
+        result.classList.add('hidden');
+      }
+
+      function setLoading(isLoading) {
+        loader.classList.toggle('hidden', !isLoading);
+        submitBtn.disabled = isLoading;
+      }
+
+      function showError(message) {
+        error.textContent = message;
+        error.classList.remove('hidden');
+      }
+
+      function showResult(html) {
+        result.innerHTML = html;
+        result.classList.remove('hidden');
+      }
+
+      function runExtraction() {
+        clearMessages();
+
+        const payload = {
+          extractionType,
+          mode: modeEl.value,
+          exportPdf: exportPdf.checked,
+          exportSheet: exportSheet.checked
+        };
+
+        if (!payload.exportPdf && !payload.exportSheet) {
+          showError('Choisis au moins un export: PDF ou Sheet.');
+          return;
+        }
+
+        if (extractionType !== 'tag') {
+          if (!selectionValue.value) {
+            showError('Choisis une valeur dans le dropdown.');
+            return;
+          }
+          payload.selectionValue = selectionValue.value;
+        }
+
+        if (payload.mode === 'month') {
+          if (!monthInput.value) {
+            showError('Choisis un mois.');
+            return;
+          }
+          payload.month = monthInput.value;
+        } else {
+          if (!startDate.value || !endDate.value) {
+            showError('Choisis une date de début et de fin.');
+            return;
+          }
+          payload.startDate = startDate.value;
+          payload.endDate = endDate.value;
+        }
+
+        setLoading(true);
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            setLoading(false);
+
+            let html =
+              '<b>Extraction terminée.</b><br>' +
+              'Période: ' + res.period + '<br>' +
+              'Transactions: ' + res.txCount;
+
+            if (res.exportPdf) {
+              html +=
+                '<br>Fichier: ' + res.fileName +
+                '<br><a href="' + res.fileUrl + '" target="_blank">Ouvrir le PDF</a>';
+            }
+
+            if (res.exportSheet) {
+              html +=
+                '<br>Feuille: ' + res.sheetName +
+                '<br><a href="' + res.sheetUrl + '" target="_blank">Ouvrir la feuille</a>';
+            }
+
+            showResult(html);
+
+            if (res.exportSheet && !res.exportPdf) {
+              google.script.host.close();
+            }
+          })
+          .withFailureHandler((err) => {
+            setLoading(false);
+            showError(err && err.message ? err.message : 'Erreur inconnue.');
+          })
+          .runExtraction(payload);
+      }
+    </script>
+  </body>
+</html>
