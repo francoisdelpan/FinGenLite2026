@@ -37,7 +37,8 @@ function runExtraction(payload) {
     if (!isDateInRange_(rawDate, range.start, range.end)) return;
 
     const amount = Number(rawAmount);
-    if (isNaN(amount) || amount >= 0) return;
+    if (isNaN(amount)) return;
+    if (extractionType === 'tag' && amount >= 0) return;
 
     if (filter.column) {
       const rawFilterValue = row[filter.column - 1];
