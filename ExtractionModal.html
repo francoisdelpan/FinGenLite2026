@@ -264,14 +264,21 @@
         </div>
       </div>
 
-      <div id="selectionSection" class="section hidden">
-        <span class="section-title">Filtre</span>
+      <? if (extractionType !== 'tag') { ?>
+        <div class="section">
+          <span class="section-title">Filtre</span>
 
-        <div class="field">
-          <label id="selectionLabel" for="selectionValue"></label>
-          <select id="selectionValue"></select>
+          <div class="field">
+            <label for="selectionValue"><?= selectionLabel ?></label>
+            <select id="selectionValue">
+              <option value=""><?= selectionPlaceholder || 'Choisis une valeur' ?></option>
+              <? for (let i = 0; i < selectionOptions.length; i++) { ?>
+                <option value="<?= selectionOptions[i] ?>"><?= selectionOptions[i] ?></option>
+              <? } ?>
+            </select>
+          </div>
         </div>
-      </div>
+      <? } ?>
 
       <div class="section">
         <span class="section-title">Exports</span>
@@ -312,9 +319,6 @@
 
     <script>
       const extractionType = <?= JSON.stringify(extractionType) ?>;
-      const selectionLabelText = <?= JSON.stringify(selectionLabel) ?>;
-      const selectionPlaceholder = <?= JSON.stringify(selectionPlaceholder) ?>;
-      const selectionOptions = <?= JSON.stringify(selectionOptions) ?>;
 
       const modeEl = document.getElementById('mode');
       const monthBox = document.getElementById('monthBox');
@@ -322,8 +326,6 @@
       const monthInput = document.getElementById('monthInput');
       const startDate = document.getElementById('startDate');
       const endDate = document.getElementById('endDate');
-      const selectionSection = document.getElementById('selectionSection');
-      const selectionLabel = document.getElementById('selectionLabel');
       const selectionValue = document.getElementById('selectionValue');
       const exportPdf = document.getElementById('exportPdf');
       const exportSheet = document.getElementById('exportSheet');
@@ -333,7 +335,6 @@
       const submitBtn = document.getElementById('submitBtn');
 
       monthInput.value = new Date().toISOString().slice(0, 7);
-      hydrateSelection();
 
       modeEl.addEventListener('change', () => {
         const byMonth = modeEl.value === 'month';
@@ -341,25 +342,6 @@
         rangeBox.classList.toggle('hidden', byMonth);
         clearMessages();
       });
-
-      function hydrateSelection() {
-        if (!selectionLabelText) return;
-
-        selectionSection.classList.remove('hidden');
-        selectionLabel.textContent = selectionLabelText;
-
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = selectionPlaceholder || 'Choisis une valeur';
-        selectionValue.appendChild(placeholder);
-
-        selectionOptions.forEach((optionValue) => {
-          const option = document.createElement('option');
-          option.value = optionValue;
-          option.textContent = optionValue;
-          selectionValue.appendChild(option);
-        });
-      }
 
       function clearMessages() {
         error.textContent = '';
@@ -398,8 +380,8 @@
           return;
         }
 
-        if (extractionType !== 'tag') {
-          if (!selectionValue.value) {
+        if (selectionValue) {
+          if (!selectionValue || !selectionValue.value) {
             showError('Choisis une valeur dans le dropdown.');
             return;
           }
